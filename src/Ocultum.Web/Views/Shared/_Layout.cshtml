@@ -1,0 +1,64 @@
+@{
+    var nav = ViewData["Nav"] as string ?? string.Empty;
+    string Active(string key) => nav == key ? "active" : string.Empty;
+    string Current(string key) => nav == key ? "page" : string.Empty;
+}
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>@ViewData["Title"] · Ocultum</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="stylesheet" href="~/lib/inter/inter.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/js/theme-init.js" asp-append-version="true"></script>
+</head>
+<body>
+    <a class="visually-hidden-focusable position-absolute m-2 p-2 bg-body rounded" href="#main">Pular para o conteúdo</a>
+    <nav class="navbar navbar-expand-md oc-navbar sticky-top" aria-label="Principal">
+        <div class="container-xxl">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span class="oc-logo" aria-hidden="true"><i class="bi bi-eye-slash-fill"></i></span>
+                <span>Ocultum</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav-menu"
+                    aria-controls="nav-menu" aria-expanded="false" aria-label="Abrir menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nav-menu">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item"><a class="nav-link @Active("embed")" aria-current="@Current("embed")" href="/"><i class="bi bi-lock me-1"></i>Esconder</a></li>
+                    <li class="nav-item"><a class="nav-link @Active("extract")" aria-current="@Current("extract")" href="/extract"><i class="bi bi-unlock me-1"></i>Revelar</a></li>
+                    <li class="nav-item"><a class="nav-link @Active("lab")" aria-current="@Current("lab")" href="/lab"><i class="bi bi-activity me-1"></i>Laboratório</a></li>
+                    <li class="nav-item"><a class="nav-link @Active("about")" aria-current="@Current("about")" href="/about"><i class="bi bi-info-circle me-1"></i>Sobre</a></li>
+                </ul>
+                <button id="theme-toggle" class="btn btn-sm oc-btn-ghost" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+                    <i class="bi bi-sun-fill" data-theme-icon></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main" class="container-xxl py-4 py-lg-5">
+        @RenderBody()
+    </main>
+
+    <footer class="container-xxl pb-4 text-body-secondary small">
+        <hr class="opacity-25" />
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+            <span><i class="bi bi-shield-lock me-1"></i>Tudo roda na sua máquina, em 127.0.0.1. Nada é enviado para a internet.</span>
+            <span>Interface para o Steghide 0.5.1 · <a href="/openapi/v1.json" class="link-secondary">API (OpenAPI)</a></span>
+        </div>
+    </footer>
+
+    <div id="toasts" class="toast-container position-fixed bottom-0 end-0 p-3" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="~/js/app.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
