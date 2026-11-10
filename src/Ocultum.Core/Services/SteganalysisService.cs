@@ -24,8 +24,8 @@ public sealed class SteganalysisService(
             throw new UnsupportedCoverFormatException("Visual analysis supports JPEG and BMP images only.");
         }
 
-        var cover = await ReadAllAsync(command.Cover.Content, cancellationToken);
-        var stego = await ReadAllAsync(command.Stego.Content, cancellationToken);
+        var cover = await command.Cover.Content.ReadAllBytesAsync(cancellationToken);
+        var stego = await command.Stego.Content.ReadAllBytesAsync(cancellationToken);
         return await Task.Run(() => analyzer.Compare(cover, stego), cancellationToken);
     }
 
@@ -43,7 +43,7 @@ public sealed class SteganalysisService(
             throw new UnsupportedCoverFormatException("The robustness test supports JPEG files only.");
         }
 
-        var original = await ReadAllAsync(command.StegoFile.Content, cancellationToken);
+        var original = await command.StegoFile.Content.ReadAllBytesAsync(cancellationToken);
         var directory = workspace.Create();
         try
         {
@@ -85,12 +85,5 @@ public sealed class SteganalysisService(
                 directory.Delete(ProbeOutput);
             }
         }
-    }
-
-    private static async Task<byte[]> ReadAllAsync(Stream stream, CancellationToken cancellationToken)
-    {
-        using var buffer = new MemoryStream();
-        await stream.CopyToAsync(buffer, cancellationToken);
-        return buffer.ToArray();
     }
 }

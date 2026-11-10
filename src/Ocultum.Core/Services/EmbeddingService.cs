@@ -170,7 +170,7 @@ public sealed class EmbeddingService(
             var file = command.PayloadFiles[0];
             return new Payload(
                 FileNameSanitizer.Sanitize(file.FileName, "file.bin"),
-                await ReadAllAsync(file.Content, cancellationToken));
+                await file.Content.ReadAllBytesAsync(cancellationToken));
         }
 
         using var buffer = new MemoryStream();
@@ -208,12 +208,6 @@ public sealed class EmbeddingService(
         return WorkspaceFileNames.IsReserved(ascii) ? "payload-" + ascii : ascii;
     }
 
-    private static async Task<byte[]> ReadAllAsync(Stream stream, CancellationToken cancellationToken)
-    {
-        using var buffer = new MemoryStream();
-        await stream.CopyToAsync(buffer, cancellationToken);
-        return buffer.ToArray();
-    }
 
     private sealed record Payload(string FileName, byte[] Content);
 }
