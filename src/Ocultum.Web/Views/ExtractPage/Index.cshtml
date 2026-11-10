@@ -1,0 +1,106 @@
+@model ExtractPageViewModel
+@{
+    ViewData["Title"] = "Revelar";
+    ViewData["Nav"] = "extract";
+}
+
+<div class="oc-page-header">
+    <h1>Revelar informação</h1>
+    <p class="text-body-secondary mb-0">Envie o arquivo que contém o segredo e a senha usada para escondê-lo.</p>
+</div>
+
+<div id="extract-app" class="row g-4" data-max-cover="@Model.MaxCoverBytes" data-max-pass="@Model.MaxPassphraseLength">
+    <div class="col-lg-5">
+        <section class="card oc-card" aria-labelledby="h-stego">
+            <div class="card-body">
+                <h2 id="h-stego" class="oc-card-title"><span class="oc-step">1</span>Arquivo com segredo</h2>
+
+                <div id="stego-drop" class="oc-dropzone" tabindex="0" role="button" aria-label="Escolher o arquivo com segredo">
+                    <i class="bi bi-cloud-arrow-down oc-dropzone-icon" aria-hidden="true"></i>
+                    <div class="fw-semibold">Arraste o arquivo aqui ou clique para escolher</div>
+                    <div class="small text-body-secondary">JPEG · BMP · WAV · AU</div>
+                    <input id="stego-input" type="file" accept=".jpg,.jpeg,.bmp,.wav,.au" hidden />
+                </div>
+                <div id="stego-selected" class="oc-selected" hidden>
+                    <div id="stego-preview" class="oc-preview"></div>
+                    <div class="flex-grow-1 min-w-0">
+                        <div id="stego-name" class="fw-semibold text-truncate"></div>
+                        <div id="stego-meta" class="small text-body-secondary"></div>
+                    </div>
+                    <button id="stego-clear" type="button" class="btn btn-sm oc-btn-ghost" aria-label="Remover arquivo"><i class="bi bi-x-lg"></i></button>
+                </div>
+
+                <h2 class="oc-card-title mt-4"><span class="oc-step">2</span>Senha</h2>
+                <div class="input-group">
+                    <input id="pass-input" type="password" class="form-control" maxlength="@Model.MaxPassphraseLength" autocomplete="off" spellcheck="false" placeholder="Deixe vazio se não usou senha" aria-label="Senha" />
+                    <button id="pass-toggle" type="button" class="btn btn-outline-secondary" aria-label="Mostrar ou ocultar a senha"><i class="bi bi-eye"></i></button>
+                </div>
+                <div id="pass-error" class="text-danger small mt-2" role="alert" hidden></div>
+
+                <button id="extract-btn" type="button" class="btn oc-btn-primary btn-lg w-100 mt-4" disabled>
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true" hidden></span>
+                    <i class="bi bi-unlock-fill me-1" data-idle-icon></i><span data-label>Revelar</span>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-lg-7">
+        <div id="extract-empty" class="card oc-card h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center text-body-secondary py-5">
+                <i class="bi bi-incognito display-4 mb-3"></i>
+                <div class="fw-semibold">O conteúdo revelado aparece aqui</div>
+                <div class="small">Mensagens de texto são exibidas na tela; arquivos ficam disponíveis para baixar.</div>
+            </div>
+        </div>
+
+        <div id="extract-error" class="alert alert-danger" role="alert" hidden></div>
+
+        <section id="extract-result" class="card oc-card" hidden aria-live="polite">
+            <div class="card-body">
+                <h2 class="oc-card-title"><i class="bi bi-check-circle-fill text-success me-2"></i>Conteúdo revelado</h2>
+
+                <div id="result-text-wrap" hidden>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold">Mensagem</span>
+                        <button id="result-copy" type="button" class="btn btn-sm btn-outline-secondary"><i class="bi bi-clipboard me-1"></i>Copiar</button>
+                    </div>
+                    <pre id="result-text" class="oc-pre oc-message mb-3"></pre>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 oc-result-file">
+                    <div class="min-w-0">
+                        <div id="result-name" class="fw-semibold text-truncate"></div>
+                        <div id="result-meta" class="small text-body-secondary"></div>
+                    </div>
+                    <a id="result-download" class="btn oc-btn-primary" href="#" download><i class="bi bi-download me-2"></i><span data-label>Baixar</span></a>
+                </div>
+
+                <dl class="oc-kv mt-3">
+                    <dt>SHA-256 do conteúdo recuperado</dt>
+                    <dd><code id="result-sha" class="oc-hash"></code> <button id="result-sha-copy" type="button" class="btn btn-sm oc-btn-ghost" aria-label="Copiar SHA-256"><i class="bi bi-clipboard"></i></button></dd>
+                    <dt>Conferir com o SHA-256 original <span class="text-body-secondary fw-normal">(opcional)</span></dt>
+                    <dd>
+                        <input id="expected-sha" type="text" class="form-control form-control-sm font-monospace" placeholder="Cole aqui o SHA-256 do conteúdo original" spellcheck="false" />
+                        <div id="expected-result" class="small mt-1" role="status"></div>
+                    </dd>
+                    <dt>Cifra</dt><dd id="result-encryption"></dd>
+                    <dt>Comprimido</dt><dd id="result-compressed"></dd>
+                    <dt>Disponível para download até</dt><dd id="result-expires"></dd>
+                </dl>
+
+                <button class="btn btn-sm oc-btn-ghost" type="button" data-bs-toggle="collapse" data-bs-target="#result-command-wrap" aria-expanded="false">
+                    <i class="bi bi-terminal me-1"></i>Ver comando Steghide
+                </button>
+                <button id="result-discard" type="button" class="btn btn-sm oc-btn-ghost" title="Apaga o arquivo temporário agora"><i class="bi bi-trash me-1"></i>Descartar</button>
+                <div class="collapse mt-2" id="result-command-wrap">
+                    <pre class="oc-pre mb-0"><code id="result-command"></code></pre>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/extract.js" asp-append-version="true"></script>
+}
