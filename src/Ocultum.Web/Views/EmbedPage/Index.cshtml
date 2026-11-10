@@ -1,0 +1,258 @@
+@model EmbedPageViewModel
+@{
+    ViewData["Title"] = "Esconder";
+    ViewData["Nav"] = "embed";
+}
+
+<div class="oc-page-header">
+    <h1>Esconder informação</h1>
+    <p class="text-body-secondary mb-0">Escolha uma capa, defina o que esconder e proteja com senha. O resultado parece um arquivo comum.</p>
+</div>
+
+<div id="embed-app" class="row g-4"
+     data-max-cover="@Model.MaxCoverBytes"
+     data-max-payload="@Model.MaxPayloadBytes"
+     data-max-files="@Model.MaxPayloadFiles"
+     data-max-pass="@Model.MaxPassphraseLength">
+
+    <div class="col-lg-8 d-flex flex-column gap-4">
+
+        <section class="card oc-card" aria-labelledby="h-cover">
+            <div class="card-body">
+                <h2 id="h-cover" class="oc-card-title"><span class="oc-step">1</span>Cobertura</h2>
+                <p class="text-body-secondary small">O arquivo que vai carregar o segredo. Aceita JPEG, BMP, WAV e AU (até <span id="max-cover-label"></span>).</p>
+
+                <div id="cover-drop" class="oc-dropzone" tabindex="0" role="button" aria-label="Escolher arquivo de cobertura">
+                    <i class="bi bi-cloud-arrow-up oc-dropzone-icon" aria-hidden="true"></i>
+                    <div class="fw-semibold">Arraste a cobertura aqui ou clique para escolher</div>
+                    <div class="small text-body-secondary">JPEG · BMP · WAV · AU</div>
+                    <input id="cover-input" type="file" accept=".jpg,.jpeg,.bmp,.wav,.au" hidden />
+                </div>
+
+                <div id="cover-selected" class="oc-selected" hidden>
+                    <div id="cover-preview" class="oc-preview"></div>
+                    <div class="flex-grow-1 min-w-0">
+                        <div id="cover-name" class="fw-semibold text-truncate"></div>
+                        <div id="cover-meta" class="small text-body-secondary"></div>
+                        <div id="cover-inspecting" class="small text-body-secondary mt-1" hidden>
+                            <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>Medindo a capacidade…
+                        </div>
+                    </div>
+                    <button id="cover-clear" type="button" class="btn btn-sm oc-btn-ghost" aria-label="Remover cobertura"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <div id="cover-error" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
+            </div>
+        </section>
+
+        <section class="card oc-card" aria-labelledby="h-content">
+            <div class="card-body">
+                <h2 id="h-content" class="oc-card-title"><span class="oc-step">2</span>Conteúdo</h2>
+
+                <div class="oc-presets" role="radiogroup" aria-label="O que esconder">
+                    <input class="btn-check" type="radio" name="mode" id="mode-message" value="message" checked />
+                    <label class="oc-preset" for="mode-message">
+                        <i class="bi bi-chat-left-text"></i>
+                        <span class="fw-semibold">Mensagem secreta</span>
+                        <span class="small text-body-secondary">Escreva um texto</span>
+                    </label>
+                    <input class="btn-check" type="radio" name="mode" id="mode-files" value="files" />
+                    <label class="oc-preset" for="mode-files">
+                        <i class="bi bi-files"></i>
+                        <span class="fw-semibold">Enviar arquivo</span>
+                        <span class="small text-body-secondary">Um ou vários</span>
+                    </label>
+                    <input class="btn-check" type="radio" name="mode" id="mode-stamp" value="stamp" />
+                    <label class="oc-preset" for="mode-stamp">
+                        <i class="bi bi-patch-check"></i>
+                        <span class="fw-semibold">Carimbo de autoria</span>
+                        <span class="small text-body-secondary">Marca d'água invisível</span>
+                    </label>
+                </div>
+
+                <div id="pane-message" class="mt-3">
+                    <label for="message-input" class="form-label">Mensagem</label>
+                    <textarea id="message-input" class="form-control" rows="5" maxlength="200000" placeholder="Digite o texto que será escondido…"></textarea>
+                    <div class="form-text"><span id="message-count">0 bytes</span></div>
+                </div>
+
+                <div id="pane-files" class="mt-3" hidden>
+                    <div id="files-drop" class="oc-dropzone oc-dropzone-sm" tabindex="0" role="button" aria-label="Escolher arquivos para esconder">
+                        <i class="bi bi-paperclip oc-dropzone-icon" aria-hidden="true"></i>
+                        <div class="fw-semibold">Arraste os arquivos aqui ou clique para escolher</div>
+                        <div class="small text-body-secondary">Vários arquivos viram um .zip automaticamente</div>
+                        <input id="files-input" type="file" multiple hidden />
+                    </div>
+                    <ul id="files-list" class="list-group list-group-flush mt-2"></ul>
+                </div>
+
+                <div id="pane-stamp" class="mt-3" hidden>
+                    <label for="stamp-author" class="form-label">Autor</label>
+                    <input id="stamp-author" type="text" class="form-control" maxlength="120" placeholder="Seu nome" autocomplete="name" />
+                    <div class="form-text">O carimbo registra autor, data e o SHA-256 da cobertura original. Escolha a cobertura primeiro.</div>
+                    <label class="form-label mt-3">Prévia do que será escondido</label>
+                    <pre id="stamp-preview" class="oc-pre mb-0"></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="card oc-card" aria-labelledby="h-protect">
+            <div class="card-body">
+                <h2 id="h-protect" class="oc-card-title"><span class="oc-step">3</span>Proteção</h2>
+
+                <label for="pass-input" class="form-label">Senha <span class="text-body-secondary fw-normal">(opcional, mas recomendada)</span></label>
+                <div class="input-group">
+                    <input id="pass-input" type="password" class="form-control" maxlength="@Model.MaxPassphraseLength" autocomplete="new-password" spellcheck="false" />
+                    <button id="pass-toggle" type="button" class="btn btn-outline-secondary" aria-label="Mostrar ou ocultar a senha" title="Mostrar/ocultar"><i class="bi bi-eye"></i></button>
+                    <button id="pass-generate" type="button" class="btn btn-outline-secondary" title="Gerar uma senha forte"><i class="bi bi-magic me-1"></i>Gerar</button>
+                </div>
+                <div class="oc-strength mt-2" aria-live="polite">
+                    <div class="progress" role="progressbar" aria-label="Força da senha" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0">
+                        <div id="pass-strength-bar" class="progress-bar" style="width:0%"></div>
+                    </div>
+                    <div id="pass-strength-label" class="small text-body-secondary mt-1"></div>
+                </div>
+
+                <div id="pass-confirm-wrap" class="mt-3" hidden>
+                    <label for="pass-confirm" class="form-label">Confirmar senha</label>
+                    <input id="pass-confirm" type="password" class="form-control" maxlength="@Model.MaxPassphraseLength" autocomplete="new-password" spellcheck="false" />
+                </div>
+                <div id="pass-error" class="text-danger small mt-2" role="alert" hidden></div>
+
+                <div id="pass-warning" class="alert alert-warning d-flex gap-2 mt-3 mb-0" role="note">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <div><strong>Sem senha, qualquer pessoa com o Steghide extrai o conteúdo.</strong> Ele fica escondido, mas não protegido.</div>
+                </div>
+
+                <button class="btn btn-sm oc-btn-ghost mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#advanced" aria-expanded="false" aria-controls="advanced">
+                    <i class="bi bi-sliders me-1"></i>Opções avançadas
+                </button>
+                <div id="advanced" class="collapse">
+                    <div class="row g-3 mt-1">
+                        <div class="col-sm-6">
+                            <label for="cipher" class="form-label">Cifra
+                                <i class="bi bi-question-circle text-body-secondary" data-bs-toggle="tooltip" data-bs-title="Algoritmo que cifra o conteúdo. O padrão do Steghide é Rijndael-128 (AES) em modo CBC."></i>
+                            </label>
+                            <select id="cipher" class="form-select"><option value="">Padrão (rijndael-128)</option></select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="mode" class="form-label">Modo
+                                <i class="bi bi-question-circle text-body-secondary" data-bs-toggle="tooltip" data-bs-title="Modo de operação da cifra de bloco (CBC, CFB, OFB...). Cifras de fluxo não usam modo."></i>
+                            </label>
+                            <select id="mode" class="form-select" disabled><option value="">Padrão (cbc)</option></select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="compression" class="form-label">Compressão
+                                <i class="bi bi-question-circle text-body-secondary" data-bs-toggle="tooltip" data-bs-title="Comprimir antes de esconder deixa o conteúdo menor e cabe mais. Nível 9 comprime mais; 'Nenhuma' desliga."></i>
+                            </label>
+                            <select id="compression" class="form-select">
+                                <option value="">Padrão</option>
+                                <option value="0">Nenhuma</option>
+                                <option value="1">1 (mais rápida)</option><option value="2">2</option><option value="3">3</option>
+                                <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                                <option value="7">7</option><option value="8">8</option><option value="9">9 (menor)</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6 d-flex flex-column justify-content-end gap-2">
+                            <div class="form-check">
+                                <input id="opt-checksum" class="form-check-input" type="checkbox" checked />
+                                <label for="opt-checksum" class="form-check-label">Incluir checksum (CRC32)
+                                    <i class="bi bi-question-circle text-body-secondary" data-bs-toggle="tooltip" data-bs-title="Permite detectar corrupção ao extrair. Ocupa alguns bytes."></i>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input id="opt-filename" class="form-check-input" type="checkbox" checked />
+                                <label for="opt-filename" class="form-check-label">Guardar o nome do arquivo
+                                    <i class="bi bi-question-circle text-body-secondary" data-bs-toggle="tooltip" data-bs-title="Grava o nome original dentro do arquivo escondido. Desmarque se o nome também é sensível."></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-lg-4">
+        <aside class="oc-summary" aria-label="Resumo">
+            <div class="card oc-card">
+                <div class="card-body">
+                    <h2 class="oc-card-title mb-3">Resumo</h2>
+                    <dl class="oc-summary-list">
+                        <dt>Cobertura</dt><dd id="sum-cover" class="text-body-secondary">Nenhuma</dd>
+                        <dt>Conteúdo</dt><dd id="sum-payload" class="text-body-secondary">Vazio</dd>
+                        <dt>Proteção</dt><dd id="sum-protection" class="text-body-secondary">Sem senha</dd>
+                    </dl>
+
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>Capacidade</span><span id="cap-text" class="text-body-secondary">—</span>
+                        </div>
+                        <div class="progress oc-meter" role="progressbar" aria-label="Capacidade usada" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div id="cap-bar" class="progress-bar" style="width:0%"></div>
+                        </div>
+                        <div id="cap-note" class="small mt-2" role="status"></div>
+                    </div>
+
+                    <button id="embed-btn" type="button" class="btn oc-btn-primary btn-lg w-100 mt-4" disabled>
+                        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true" hidden></span>
+                        <i class="bi bi-lock-fill me-1" data-idle-icon></i><span data-label>Esconder</span>
+                    </button>
+                    <div id="embed-hint" class="small text-body-secondary mt-2"></div>
+                    <div id="embed-error" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<div class="modal fade" id="result-modal" tabindex="-1" aria-labelledby="result-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content oc-card">
+            <div class="modal-header border-0 pb-0">
+                <h2 class="modal-title fs-4 d-flex align-items-center gap-2" id="result-title"><i class="bi bi-check-circle-fill text-success"></i>Pronto, está escondido</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 oc-result-file">
+                    <div class="min-w-0">
+                        <div id="result-name" class="fw-semibold text-truncate"></div>
+                        <div id="result-meta" class="small text-body-secondary"></div>
+                    </div>
+                    <a id="result-download" class="btn oc-btn-primary" href="#" download><i class="bi bi-download me-2"></i>Baixar arquivo</a>
+                </div>
+
+                <dl class="oc-kv mt-3">
+                    <dt>SHA-256 do arquivo gerado</dt>
+                    <dd><code id="result-sha" class="oc-hash"></code> <button id="result-sha-copy" type="button" class="btn btn-sm oc-btn-ghost" aria-label="Copiar SHA-256"><i class="bi bi-clipboard"></i></button></dd>
+                    <dt>SHA-256 do conteúdo escondido</dt>
+                    <dd><code id="result-payload-sha" class="oc-hash"></code></dd>
+                    <dt>Disponível para download até</dt>
+                    <dd id="result-expires"></dd>
+                </dl>
+
+                <div class="alert alert-warning d-flex gap-2" role="note">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <div><strong>Não reenvie por apps que recomprimem a imagem</strong> (WhatsApp, Instagram, e-mails que reduzem fotos). A compressão destrói o que está escondido. Envie como documento/arquivo.</div>
+                </div>
+
+                <button class="btn btn-sm oc-btn-ghost" type="button" data-bs-toggle="collapse" data-bs-target="#result-command-wrap" aria-expanded="false">
+                    <i class="bi bi-terminal me-1"></i>Ver comando Steghide
+                </button>
+                <div class="collapse mt-2" id="result-command-wrap">
+                    <p class="small text-body-secondary mb-1">É isto que o app executou por baixo dos panos (a senha aparece mascarada):</p>
+                    <pre class="oc-pre mb-0"><code id="result-command"></code></pre>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <a class="btn oc-btn-ghost" href="/lab"><i class="bi bi-activity me-1"></i>Analisar no laboratório</a>
+                <button id="result-discard" type="button" class="btn oc-btn-ghost" title="Apaga o arquivo temporário agora"><i class="bi bi-trash me-1"></i>Descartar</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button id="result-again" type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Esconder outro</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/js/embed.js" asp-append-version="true"></script>
+}
