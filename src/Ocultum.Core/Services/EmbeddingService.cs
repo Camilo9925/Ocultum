@@ -87,7 +87,7 @@ public sealed class EmbeddingService(
                 Path.GetFileNameWithoutExtension(command.Cover.FileName), "cover") + "-stego" + format.FileExtension();
 
             await directory.WriteMetadataAsync(
-                new StoredFileMetadata("stego-file", stegoFile, downloadName, format.ContentType(), size, sha256),
+                new StoredFileMetadata(StoredFileKinds.StegoFile, stegoFile, downloadName, format.ContentType(), size, sha256),
                 cancellationToken);
 
             return new StegoFileResult(

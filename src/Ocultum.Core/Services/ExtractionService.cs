@@ -45,7 +45,7 @@ public sealed class ExtractionService(
             var sha256 = Convert.ToHexStringLower(SHA256.HashData(content));
 
             await directory.WriteMetadataAsync(
-                new StoredFileMetadata("extraction", WorkspaceFileNames.Extracted, fileName, "application/octet-stream", content.Length, sha256),
+                new StoredFileMetadata(StoredFileKinds.Extraction, WorkspaceFileNames.Extracted, fileName, "application/octet-stream", content.Length, sha256),
                 cancellationToken);
 
             return new ExtractionResult(

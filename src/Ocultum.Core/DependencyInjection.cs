@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.AddScoped<IEmbeddingService, EmbeddingService>();
         services.AddScoped<IExtractionService, ExtractionService>();
         services.AddScoped<ISteganalysisService, SteganalysisService>();
+        services.AddScoped<IStoredFileService, StoredFileService>();
         return services;
     }
 }
