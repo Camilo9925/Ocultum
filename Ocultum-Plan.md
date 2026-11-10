@@ -348,10 +348,14 @@ Se o tempo apertar, corta-se de baixo para cima (P3 → P2); os P1 não se mexem
 
 ## 15. Decisões em aberto
 
-1. Confirmar MVC + .NET 10 (ou .NET 8, se for o SDK instalado).
-2. Laboratório de esteganálise entra no escopo? (maior diferencial, maior custo)
-3. Nome "Ocultum" ou outro?
-4. Histórico (P2) entra? Se sim, o projeto passa a ter `OperationRepository`.
+Todas confirmadas:
+
+1. **MVC + .NET 10:** confirmado (SDK 10.0 instalado).
+2. **Laboratório de esteganálise:** entra no escopo (histograma, entropia, PSNR, diferença e teste de robustez). O "LSB ingênuo" com qui-quadrado (stretch) fica para depois.
+3. **Nome:** "Ocultum" mantido.
+4. **Histórico (P2):** **adiado**. Por enquanto o projeto não usa banco de dados: sem EF Core/SQLite, sem `OperationRepository`, sem a tela `/history` e sem as rotas `/api/v1/operations`. Fica para uma próxima etapa.
+
+**Ajuste de stack:** a análise de imagem usa **SkiaSharp** (MIT) em vez do ImageSharp. O ImageSharp 4 exige licença comercial em builds Release e o 3.x tem vulnerabilidades conhecidas.
 
 ---
 
