@@ -1,0 +1,9 @@
+* text=auto
+*.exe binary
+*.dll binary
+*.pdf binary
+*.mo binary
+*.jpg binary
+*.bmp binary
+*.wav binary
+*.au binary
