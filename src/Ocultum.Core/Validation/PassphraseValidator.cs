@@ -6,8 +6,9 @@ namespace Ocultum.Core.Validation;
 public sealed class PassphraseValidator(IOptions<LimitsOptions> limits)
 {
     /// <summary>
-    /// The Cygwin build of Steghide reads its command line through the ANSI code page, so characters outside
-    /// printable ASCII can be silently turned into <c>?</c>, making different passphrases equivalent.
+    /// The Cygwin build of Steghide reads its command line through the ANSI code page. Latin-1 characters survive
+    /// (verified against the real executable), but anything outside it is silently turned into <c>?</c>,
+    /// which would make different passphrases equivalent.
     /// </summary>
     public void Validate(string passphrase)
     {
@@ -20,11 +21,11 @@ public sealed class PassphraseValidator(IOptions<LimitsOptions> limits)
 
         foreach (var c in passphrase)
         {
-            if (c is < ' ' or > '~')
+            if (char.IsControl(c) || c > 'ÿ')
             {
                 throw new InvalidInputException(
                     "The passphrase contains unsupported characters.",
-                    "Use only letters without accents, digits, spaces and common punctuation.");
+                    "Use only Latin letters (accents are fine), digits, spaces and common punctuation.");
             }
         }
     }

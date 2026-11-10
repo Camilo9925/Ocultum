@@ -204,16 +204,20 @@ public sealed class SteghideClient : ISteghideClient, IDisposable
         for (var i = 0; i < args.Count; i++)
         {
             var arg = args[i];
+            var isPassphrase = i > 0 && args[i - 1] == "-p";
             builder.Append(' ');
 
-            if (arg.StartsWith('-'))
+            if (isPassphrase)
             {
-                builder.Append(arg);
+                builder.Append('"').Append(arg.Length > 0 ? MaskedPassphrase : string.Empty).Append('"');
+            }
+            else if (arg.Length == 0 || arg.Any(char.IsWhiteSpace))
+            {
+                builder.Append('"').Append(arg).Append('"');
             }
             else
             {
-                var isPassphrase = i > 0 && args[i - 1] == "-p";
-                builder.Append('"').Append(isPassphrase && arg.Length > 0 ? MaskedPassphrase : arg).Append('"');
+                builder.Append(arg);
             }
         }
 
