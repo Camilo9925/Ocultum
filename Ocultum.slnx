@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ocultum.Core/Ocultum.Core.csproj" />
+    <Project Path="src/Ocultum.Infrastructure/Ocultum.Infrastructure.csproj" />
+    <Project Path="src/Ocultum.Web/Ocultum.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ocultum.Tests/Ocultum.Tests.csproj" />
+  </Folder>
+</Solution>
