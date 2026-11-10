@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Ocultum": {
+      "commandName": "Project",
+      "environmentName": "Development"
+    }
+  }
+}
