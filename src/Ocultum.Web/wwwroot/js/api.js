@@ -103,6 +103,11 @@ export function describeError(error) {
       return { title: 'Esse arquivo não está mais disponível.', hint: 'Os arquivos temporários expiram depois de alguns minutos. Gere novamente.' };
     case 'IMAGE_PROCESSING_FAILED':
       return { title: 'Não foi possível processar a imagem.', hint: traduzirDetalhe(p.detail ?? '') };
+    case 'COVER_NOT_PROCESSABLE':
+      return {
+        title: 'O Steghide não conseguiu processar este arquivo.',
+        hint: 'É uma limitação do próprio Steghide: ele trava com capas muito grandes combinadas a conteúdos grandes, com BMP de paleta (8 bits) e com áudio incompleto. Tente um JPEG, uma imagem menor ou menos conteúdo.',
+      };
     case 'STEGHIDE_UNAVAILABLE':
       return { title: 'O Steghide não foi encontrado.', hint: 'Confira a opção Steghide:ExecutablePath no appsettings.json (veja o README).' };
     case 'STEGHIDE_FAILURE':

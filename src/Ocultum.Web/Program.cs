@@ -107,7 +107,11 @@ app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseMiddleware<LocalRequestGuardMiddleware>();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
-app.UseStaticFiles();
+// Local app: always revalidate (cheap, ETag-based) so a newer package is never masked by modules cached from an older one.
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context => context.Context.Response.Headers.CacheControl = "no-cache",
+});
 app.MapOpenApi();
 app.MapControllers();
 

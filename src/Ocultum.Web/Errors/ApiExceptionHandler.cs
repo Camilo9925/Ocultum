@@ -74,6 +74,7 @@ public sealed class ApiExceptionHandler(IOptions<Microsoft.AspNetCore.Http.Json.
         FileTooLargeException => StatusCodes.Status413PayloadTooLarge,
         UnsupportedCoverFormatException => StatusCodes.Status415UnsupportedMediaType,
         CapacityExceededException or WrongPassphraseOrNoDataException or EmptyPayloadException or ImageProcessingException
+            or CoverNotProcessableException
             => StatusCodes.Status422UnprocessableEntity,
         _ => StatusCodes.Status500InternalServerError,
     };

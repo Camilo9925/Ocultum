@@ -85,6 +85,7 @@ A pasta `samples/` traz arquivos prontos: `cover.jpg`, `cover.bmp`, `cover.wav`,
 - **A senha vai na linha de comando** do processo enquanto ele roda (alguns milissegundos). O app é local e nunca registra nem guarda senhas.
 - **Caracteres da senha:** o Steghide para Windows lê a linha de comando pela página de código ANSI. Caracteres fora do Latin-1 (japonês, emoji, `€`) virariam `?` e senhas diferentes se tornariam equivalentes, por isso são recusados.
 - **Capacidade:** costuma ser de 1% a 10% do tamanho da cobertura.
+- **Limitação do Steghide para Windows (32 bits):** ele pode travar com capas muito grandes (principalmente BMP de vários MB) combinadas a conteúdos grandes, com BMP de paleta de 8 bits malformado e com áudio incompleto. O app avisa com a mensagem *"O Steghide não conseguiu processar este arquivo"*. Prefira JPEG e mantenha o conteúdo bem abaixo da capacidade.
 
 ## API REST
 
@@ -109,8 +110,8 @@ Prefixo `/api/v1`. Recursos no plural, JSON em `camelCase`, uploads em `multipar
 | `404` | `id` inexistente ou expirado |
 | `413` | Arquivo acima do limite |
 | `415` | Formato não suportado (assinatura inválida) |
-| `422` | Capacidade excedida, senha incorreta ou sem dados, conteúdo vazio |
-| `500` | Falha inesperada do Steghide |
+| `422` | Capacidade excedida, senha incorreta ou sem dados, conteúdo vazio, ou o Steghide não conseguiu processar o arquivo (`COVER_NOT_PROCESSABLE`) |
+| `500` | Falha inesperada do Steghide (travamento conhecido vira `422`) |
 
 **Exemplos com `curl`** (no PowerShell use `curl.exe`; as barras `\` abaixo são do Bash, no PowerShell troque por crases ou escreva em uma linha):
 
@@ -176,6 +177,7 @@ Em `appsettings.json`, na pasta do `Ocultum.exe`. Qualquer opção também pode 
 | **"O Steghide não foi encontrado"** | Confirme que a pasta `tools/steghide/` (com `steghide.exe` e as DLLs `cyg*.dll`) está ao lado do `Ocultum.exe`, ou ajuste `Steghide:ExecutablePath`. |
 | **Antivírus bloqueia ou apaga arquivos** | O Steghide usa DLLs do Cygwin, e alguns antivírus desconfiam delas. Adicione a pasta do Ocultum às exceções e extraia o zip de novo. |
 | **Janela do navegador não abre** | Abra manualmente o endereço mostrado na janela do aplicativo. |
+| **"O Steghide não conseguiu processar este arquivo"** | Limitação do próprio Steghide. Use um JPEG, uma imagem menor ou reduza o conteúdo. |
 | **Arquivo rejeitado** | Verifique o formato (JPEG, BMP, WAV ou AU de verdade, não só a extensão) e o medidor de capacidade. |
 | **"Não foi possível revelar nada"** | Senha incorreta, arquivo sem segredo ou imagem recomprimida (por exemplo, enviada por WhatsApp). |
 | **Senha recusada** | Use só letras latinas (acentos são aceitos), números e pontuação comum. |

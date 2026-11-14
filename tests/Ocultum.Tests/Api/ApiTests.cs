@@ -269,6 +269,54 @@ public class ApiTests : IClassFixture<OcultumApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
+    private static byte[] BrokenPaletteBmp(int side)
+    {
+        // 8-bit BMP whose palette has a single entry while the pixels use indexes 0-255: Steghide aborts with an assertion.
+        var rowSize = (side + 3) / 4 * 4;
+        var pixels = rowSize * side;
+        var bytes = new byte[14 + 40 + 4 + pixels];
+        bytes[0] = (byte)'B';
+        bytes[1] = (byte)'M';
+        BitConverter.GetBytes(bytes.Length).CopyTo(bytes, 2);
+        BitConverter.GetBytes(14 + 40 + 4).CopyTo(bytes, 10);
+        BitConverter.GetBytes(40).CopyTo(bytes, 14);
+        BitConverter.GetBytes(side).CopyTo(bytes, 18);
+        BitConverter.GetBytes(side).CopyTo(bytes, 22);
+        BitConverter.GetBytes((short)1).CopyTo(bytes, 26);
+        BitConverter.GetBytes((short)8).CopyTo(bytes, 28);
+        BitConverter.GetBytes(pixels).CopyTo(bytes, 34);
+        BitConverter.GetBytes(1).CopyTo(bytes, 46);
+        BitConverter.GetBytes(1).CopyTo(bytes, 50);
+        new Random(1).NextBytes(bytes.AsSpan(14 + 40 + 4));
+        return bytes;
+    }
+
+    [WindowsFact]
+    public async Task Steghide_crash_on_a_broken_palette_bmp_is_reported_as_422_without_the_raw_dump()
+    {
+        using var form = Form(
+            ("cover", new ByteArrayContent(BrokenPaletteBmp(200)), "palette.bmp"),
+            Text("message", "olá"));
+
+        var response = await _client.PostAsync("/api/v1/stego-files", form);
+
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+        var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
+        problem.GetProperty("errorCode").GetString().Should().Be("COVER_NOT_PROCESSABLE");
+        problem.GetProperty("detail").GetString().Should().NotContain("assertion").And.NotContain("stackdump");
+    }
+
+    [WindowsFact]
+    public async Task Truncated_wav_is_reported_as_422()
+    {
+        var wav = new byte[] { (byte)'R', (byte)'I', (byte)'F', (byte)'F', 0, 0, 0, 0, (byte)'W', (byte)'A', (byte)'V', (byte)'E' };
+        using var form = Form(("cover", new ByteArrayContent(wav), "cut.wav"), Text("message", "x"));
+
+        var response = await _client.PostAsync("/api/v1/stego-files", form);
+
+        response.StatusCode.Should().BeOneOf(HttpStatusCode.UnprocessableEntity, HttpStatusCode.UnsupportedMediaType);
+    }
+
     [WindowsFact]
     public async Task OpenApi_document_is_published()
     {

@@ -119,8 +119,8 @@ a:hover { color: var(--oc-accent-2); }
   display: flex; align-items: center; gap: 1rem; margin-top: 0.9rem; padding: 0.8rem;
   border: 1px solid var(--oc-card-border); border-radius: 14px; background: var(--oc-surface);
 }
-.oc-selected[hidden] { display: none; }
-.oc-dropzone[hidden] { display: none; }
+/* Bootstrap utilities such as .d-flex use !important and would otherwise defeat the [hidden] attribute. */
+[hidden] { display: none !important; }
 .oc-preview {
   flex: 0 0 auto; width: 84px; height: 64px; border-radius: 10px; overflow: hidden; display: grid; place-items: center;
   background: var(--bs-tertiary-bg); color: var(--bs-secondary-color); font-size: 1.6rem;

@@ -24,6 +24,19 @@ public class SteghideErrorMapperTests
         SteghideErrorMapper.Map(Failure("steghide: the file format of the file \"fake.jpg\" is not supported."))
             .Should().BeOfType<UnsupportedCoverFormatException>();
 
+    [Theory]
+    [InlineData("1 [main] steghide 12828 handle_exceptions: Exception: STATUS_STACK_OVERFLOW\n324 [main] steghide 12828 open_stackdumpfile: Dumping stack trace to steghide.exe.stackdump")]
+    [InlineData("1 [main] steghide 26360 handle_exceptions: Exception: STATUS_ACCESS_VIOLATION")]
+    [InlineData("steghide: assertion failed in SampleValue.cc at line number 43.")]
+    [InlineData("steghide: premature end of file \"cover.wav\" while reading wav headers.")]
+    public void Maps_steghide_crashes_to_cover_not_processable(string stderr)
+    {
+        var error = SteghideErrorMapper.Map(Failure(stderr));
+
+        error.Should().BeOfType<CoverNotProcessableException>();
+        error.Detail.Should().NotContain("stackdump").And.NotContain("handle_exceptions");
+    }
+
     [Fact]
     public void Maps_anything_else_to_a_generic_failure()
     {
