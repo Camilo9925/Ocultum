@@ -7,7 +7,7 @@ namespace Ocultum.Web.Controllers.Pages;
 
 public sealed class EmbedPageController(IOptions<LimitsOptions> limits) : Controller
 {
-    [HttpGet("/")]
+    [HttpGet("/embed")]
     public IActionResult Index()
     {
         var value = limits.Value;

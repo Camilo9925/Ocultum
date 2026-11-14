@@ -63,6 +63,17 @@ a:hover { color: var(--oc-accent-2); }
 .oc-page-header { margin-bottom: 1.75rem; }
 .oc-page-header h1 { font-size: clamp(1.6rem, 2.5vw, 2.1rem); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.35rem; }
 
+/* Welcome */
+.oc-hero { text-align: center; max-width: 46rem; margin: 0 auto 3rem; }
+.oc-hero-logo { width: 64px; height: 64px; border-radius: 18px; font-size: 1.9rem; margin-bottom: 1.25rem; }
+.oc-hero h1 { font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 750; letter-spacing: -0.035em; margin-bottom: 0.75rem; }
+.oc-hero-lead { font-size: 1.15rem; margin-bottom: 0.75rem; }
+.oc-hero .btn { border-radius: 12px; }
+.oc-section-title { font-size: 1.25rem; font-weight: 650; letter-spacing: -0.02em; margin: 1rem 0 0; }
+.oc-tile { color: inherit; transition: border-color 0.15s, transform 0.15s; }
+.oc-tile:hover { color: inherit; border-color: var(--oc-accent); transform: translateY(-2px); }
+.oc-tile .oc-card-title .bi { color: var(--oc-accent); }
+
 /* Cards */
 .oc-card {
   background: var(--oc-card-bg);

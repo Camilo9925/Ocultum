@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ocultum.Web.Controllers.Pages;
 
-public sealed class AboutPageController : Controller
+public sealed class HomePageController : Controller
 {
-    [HttpGet("/about")]
+    [HttpGet("/")]
     public IActionResult Index() => View();
 }

@@ -59,10 +59,10 @@ A pasta `samples/` traz arquivos prontos: `cover.jpg`, `cover.bmp`, `cover.wav`,
 
 | Tela | O que faz |
 |---|---|
-| **Esconder** (`/`) | Três passos: *Cobertura* (JPEG, BMP, WAV ou AU), *Conteúdo* (mensagem, arquivos ou carimbo de autoria) e *Proteção* (senha e opções avançadas). O painel lateral resume tudo e mostra o medidor de capacidade. |
+| **Início** (`/`) | Tela de boas-vindas: explica o projeto (esteganografia × criptografia, formatos aceitos, boas práticas e limites, como funciona) e leva às demais telas. |
+| **Esconder** (`/embed`) | Três passos: *Cobertura* (JPEG, BMP, WAV ou AU), *Conteúdo* (mensagem, arquivos ou carimbo de autoria) e *Proteção* (senha e opções avançadas). O painel lateral resume tudo e mostra o medidor de capacidade. |
 | **Revelar** (`/extract`) | Recebe o arquivo com segredo e a senha. Mostra mensagens na tela ou oferece o arquivo para baixar. Permite conferir o SHA-256 do conteúdo contra o original. |
 | **Laboratório** (`/lab`) | Compara imagem original e imagem com segredo: histograma, entropia, PSNR, slider antes/depois, mapa de diferença e teste de robustez. |
-| **Sobre** (`/about`) | Esteganografia × criptografia, boas práticas e limites. |
 
 ![Laboratório](docs/img/laboratorio.png)
 
