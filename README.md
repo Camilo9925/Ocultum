@@ -216,10 +216,6 @@ Ocultum/
 - **Infrastructure** executa o `steghide.exe` com `ArgumentList`, `LANG=C`, timeout e semáforo de concorrência; cada operação usa uma pasta temporária própria, com arquivos de nome simples.
 - **Web** valida a entrada, chama o serviço e devolve o resultado; não tem regra de negócio.
 
-### Escopo desta versão
-
-O **Histórico** (prioridade P2 do planejamento, que dependia de SQLite) foi **adiado**: não há banco de dados, e as rotas `/api/v1/operations` e a tela `/history` não existem ainda. O "LSB ingênuo" com teste qui-quadrado (stretch do laboratório) também ficou de fora.
-
 ## Créditos e licenças
 
 - **[Steghide](https://steghide.sourceforge.net/)** 0.5.1, de Stefan Hetzl, sob licença **GPL**. O executável para Windows (build Cygwin) está em `tools/steghide/`, acompanhado de `copying.txt` e `credits.txt`. O código-fonte está disponível no site do projeto.
